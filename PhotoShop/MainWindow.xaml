@@ -1,0 +1,60 @@
+﻿<Window x:Class="PhotoShop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PhotoShop"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:command="http://www.galasoft.ch/mvvmlight"
+        mc:Ignorable="d"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Title="MainWindow" Height="350" Width="525">
+    <Window.CommandBindings>
+        <CommandBinding Command="New" Executed="NewCommand" />
+        <CommandBinding Command="Save" Executed="SaveCommand" CanExecute="CanSave"/>
+        <CommandBinding Command="Redo" CanExecute="CanRedo" Executed="Redo" />
+        <CommandBinding Command="Undo" CanExecute="CanUndo" Executed="Undo" />
+    </Window.CommandBindings>
+    <Window.Resources>
+        <local:WpfColorConverter x:Key="colorConverter"></local:WpfColorConverter>
+        <local:MousePositionConverter x:Key="mousePositionConverter"></local:MousePositionConverter>
+    </Window.Resources>
+    <DockPanel>
+        <ToolBarTray DockPanel.Dock="Top">
+            <ToolBar>
+                <Button Command="New" Content="New" />
+                <Button Command="Save" Content="Save" />
+                <Button Command="Undo" Content="Undo" />
+                <Button Command="Redo" Content="Redo" />
+            </ToolBar>
+            <ToolBar Header="Color tools">
+                <xctk:ColorPicker MinWidth="40" x:Name="_colorPicker" VerticalAlignment="Top" SelectedColor="{Binding ViewModel.PrimaryColor, Converter={StaticResource colorConverter}}" />
+                <Button Command="{Binding ViewModel.SelectFillTool}" Content="Fill" />
+                <Button Command="{Binding ViewModel.Invert}" Content="Invert" />
+                <Button Command="{Binding ViewModel.SelectDrawTool}" Content="Draw" />
+            </ToolBar>
+            <ToolBar Header="Manipulation tools">
+                <Button Command="{Binding ViewModel.SelectPanTool}" Content="Pan" />
+            </ToolBar>
+        </ToolBarTray>
+        <local:ZoomBorder x:Name="_border" ClipToBounds="True" BorderThickness="1" BorderBrush="CadetBlue" PanEnabled="{Binding ViewModel.PanEnabled}">
+            <Image DockPanel.Dock="Bottom"
+                   Name="_image">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                        <command:EventToCommand Command="{Binding Path=ViewModel.MouseLeftButtonDown}" PassEventArgsToCommand="True" EventArgsConverter="{StaticResource mousePositionConverter}" />
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseLeftButtonUp">
+                        <command:EventToCommand Command="{Binding Path=ViewModel.MouseLeftButtonUp}" PassEventArgsToCommand="True" EventArgsConverter="{StaticResource mousePositionConverter}" />
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseMove">
+                        <command:EventToCommand Command="{Binding Path=ViewModel.MouseMove}" PassEventArgsToCommand="True" EventArgsConverter="{StaticResource mousePositionConverter}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Image>
+        </local:ZoomBorder>
+
+    </DockPanel>
+</Window>
